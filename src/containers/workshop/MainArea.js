@@ -1,5 +1,7 @@
 import {Grid} from "@material-ui/core";
 import {
+    Button,
+    ButtonGroup,
     FormControlLabel,
     FormLabel,
     InputLabel,
@@ -37,24 +39,6 @@ function getConstraint(position) {
     }
 }
 
-/**
- * update the remaining prop list by the current main prop
- * note: main prop must be selected all the time, there is no deselect option for main prop
- * @param curMainProp number
- * @param pos string indicate currently selected position
- * @returns string[] string list
- */
-// function getAvailableProps(curMainProp, pos) {
-//     let temp = [...VICE_PROP_TYPE];
-//     let curMainPropValue = getConstraint(pos)[curMainProp];
-//     if (temp.includes(curMainPropValue)) {
-//         temp.splice(temp.indexOf(curMainPropValue), 1);
-//         return temp
-//     } else {
-//         return VICE_PROP_TYPE;
-//     }
-// }
-
 
 export const Workshop = () => {
 
@@ -82,6 +66,17 @@ export const Workshop = () => {
     const [vicePropThree, setVicePropThree] = useState(0);
 
     const [vicePropFour, setVicePropFour] = useState(0);
+
+    const [remainingEnhanceCount, setRemainingEnhanceCount] = useState(5);
+
+    // 圣遗物的起始强化次数为1
+    const [enhanceCountOne, setEnhanceCountOne] = useState(1);
+
+    const [enhanceCountTwo, setEnhanceCountTwo] = useState(1);
+
+    const [enhanceCountThree, setEnhanceCountThree] = useState(1);
+
+    const [enhanceCountFour, setEnhanceCountFour] = useState(1);
 
     const handleModeChange = (event, newAlignment) => {
         setMode(newAlignment);
@@ -126,19 +121,6 @@ export const Workshop = () => {
         // console.log('level change to ', e.target.value);
         setLevel(e.target.value);
     }
-
-    // const handleVicePropTypeChange = (e) => {
-    //     e.preventDefault();
-    //     // get current remaining available props
-    //     if (e.target.value === 0) { // user deselect in current drop down
-    //
-    //     } else {
-    //         if (remainingViceProps.includes(e.target.value)) {
-    //             // this should not happen in general, but just leave it here to double check
-    //             alert('')
-    //         }
-    //     }
-    // }
 
 
     const getUpdatedUsedProps = (vicePosition, pos) => {
@@ -211,6 +193,68 @@ export const Workshop = () => {
         </Grid>
     )
 
+
+    const handleIncrementOne = (e) => {
+        e.preventDefault();
+        setEnhanceCountOne(enhanceCountOne + 1);
+        setRemainingEnhanceCount(remainingEnhanceCount - 1);
+    }
+
+    const handleDecrementOne = (e) => {
+        e.preventDefault();
+        setEnhanceCountOne(enhanceCountOne - 1);
+        setRemainingEnhanceCount(remainingEnhanceCount + 1);
+    }
+
+    const handleIncrementTwo = (e) => {
+        e.preventDefault();
+        setEnhanceCountTwo(enhanceCountTwo + 1);
+        setRemainingEnhanceCount(remainingEnhanceCount - 1);
+    }
+
+    const handleDecrementTwo = (e, pos) => {
+        e.preventDefault();
+        setEnhanceCountTwo(enhanceCountTwo - 1);
+        setRemainingEnhanceCount(remainingEnhanceCount + 1);
+    }
+
+    const handleIncrementThree = (e) => {
+        e.preventDefault();
+        setEnhanceCountThree(enhanceCountThree + 1);
+        setRemainingEnhanceCount(remainingEnhanceCount - 1);
+    }
+
+    const handleDecrementThree = (e) => {
+        e.preventDefault();
+        setEnhanceCountThree(enhanceCountThree - 1);
+        setRemainingEnhanceCount(remainingEnhanceCount + 1);
+    }
+
+    const handleIncrementFour = (e) => {
+        e.preventDefault();
+        setEnhanceCountFour(enhanceCountFour + 1);
+        setRemainingEnhanceCount(remainingEnhanceCount - 1);
+    }
+
+    const handleDecrementFour = (e) => {
+        e.preventDefault();
+        setEnhanceCountFour(enhanceCountFour - 1);
+        setRemainingEnhanceCount(remainingEnhanceCount + 1);
+    }
+
+    const GenerateEnhanceCountUI = (value, incrementHandler, decrementHandler) => (
+        <Grid item xs={4}>
+            <ButtonGroup size="small" aria-label="small outlined button group">
+                {(value > 1) ? <Button onClick={decrementHandler}>-</Button> :
+                    <Button onClick={decrementHandler} disabled>-</Button>}
+                {/*<Button onClick={handleDecrementOne}>-</Button>*/}
+                {value && <Button disabled>{value}</Button>}
+                {(remainingEnhanceCount > 0) ? <Button onClick={incrementHandler}>+</Button> :
+                    <Button onClick={incrementHandler} disabled>+</Button>}
+            </ButtonGroup>
+        </Grid>
+    )
+
     return (
         <div>
             <ToggleButtonGroup
@@ -260,43 +304,32 @@ export const Workshop = () => {
                     <p className="genshin_text">副词条属性</p>
                 </Grid>
                 <Grid item xs={4}>
-                    <p className="genshin_text">强化次数</p>
+                    <p className="genshin_text">强化次数({remainingEnhanceCount})</p>
                 </Grid>
 
 
                 {/*---------------------artifact's vice prop selection-----------------------*/}
 
-
-
-
                 {generateVicePropUI(vicePropOne, handleVicePropOneChange)}
-                <Grid item xs={4}>
-                    <p className="genshin_text">强化次数</p>
-                </Grid>
 
+                {GenerateEnhanceCountUI(enhanceCountOne, handleIncrementOne, handleDecrementOne)}
 
 
                 {generateVicePropUI(vicePropTwo, handleVicePropTwoChange)}
-                <Grid item xs={4}>
-                    <p className="genshin_text">强化次数</p>
-                </Grid>
 
+                {GenerateEnhanceCountUI(enhanceCountTwo, handleIncrementTwo, handleDecrementTwo)}
 
 
                 {generateVicePropUI(vicePropThree, handleVicePropThreeChange)}
-                <Grid item xs={4}>
-                    <p className="genshin_text">强化次数</p>
-                </Grid>
 
+                {GenerateEnhanceCountUI(enhanceCountThree, handleIncrementThree, handleDecrementThree)}
 
 
                 {generateVicePropUI(vicePropFour, handleVicePropFourChange)}
-                <Grid item xs={4}>
-                    <p className="genshin_text">强化次数</p>
-                </Grid>
+
+                {GenerateEnhanceCountUI(enhanceCountFour, handleIncrementFour, handleDecrementFour)}
 
             </Grid>
-
         </div>
 
     )
