@@ -12,14 +12,19 @@ import {
 } from "@mui/material";
 import {FormControl} from "@material-ui/core";
 import {GenshinStyles} from "../../theme";
-import {useState} from "react";
+import {Fragment, useState} from "react";
 import {
-    CROWN_CONSTRAINT,
+    calculateEnhancement,
+    CROWN_CONSTRAINT, ENHANCE_RATES,
     FEATHER_CONSTRAINT,
     FLOWER_CONSTRAINT, GOBLET_CONSTRAINT,
     MAIN_PROP_TYPES,
     SANDGLASS_CONSTRAINT, VICE_PROP_TYPE
 } from "../../components/constances";
+import Jimp from "jimp";
+import background from "../../images/erased_template.png";
+import styled from "styled-components";
+import axios from "axios";
 
 function getConstraint(position) {
     switch (position) {
@@ -38,6 +43,11 @@ function getConstraint(position) {
             return MAIN_PROP_TYPES;
     }
 }
+
+const SImg = styled.img`
+    height: 900px;
+    width: 538px;
+`;
 
 
 export const Workshop = () => {
@@ -59,13 +69,13 @@ export const Workshop = () => {
 
     const [usedProps, setUsedProps] = useState([constraints[0]]);
 
-    const [vicePropOne, setVicePropOne] = useState(0);
+    const [vicePropOne, setVicePropOne] = useState(2);
 
-    const [vicePropTwo, setVicePropTwo] = useState(0);
+    const [vicePropTwo, setVicePropTwo] = useState(3);
 
-    const [vicePropThree, setVicePropThree] = useState(0);
+    const [vicePropThree, setVicePropThree] = useState(4);
 
-    const [vicePropFour, setVicePropFour] = useState(0);
+    const [vicePropFour, setVicePropFour] = useState(5);
 
     const [remainingEnhanceCount, setRemainingEnhanceCount] = useState(5);
 
@@ -77,6 +87,8 @@ export const Workshop = () => {
     const [enhanceCountThree, setEnhanceCountThree] = useState(1);
 
     const [enhanceCountFour, setEnhanceCountFour] = useState(1);
+
+    const [artifact, setArtifact] = useState();
 
     const handleModeChange = (event, newAlignment) => {
         setMode(newAlignment);
@@ -247,7 +259,6 @@ export const Workshop = () => {
             <ButtonGroup size="small" aria-label="small outlined button group">
                 {(value > 1) ? <Button onClick={decrementHandler}>-</Button> :
                     <Button onClick={decrementHandler} disabled>-</Button>}
-                {/*<Button onClick={handleDecrementOne}>-</Button>*/}
                 {value && <Button disabled>{value}</Button>}
                 {(remainingEnhanceCount > 0) ? <Button onClick={incrementHandler}>+</Button> :
                     <Button onClick={incrementHandler} disabled>+</Button>}
@@ -255,98 +266,177 @@ export const Workshop = () => {
         </Grid>
     )
 
+    // const Generator = async () => {
+    //     let image = Jimp.loadFont('../../fonts/zh-cn.ttf').then((font) => {
+    //         background.print(font, 400, 200, 'test message');
+    //     }).then((returned) => {
+    //
+    //     })
+    //     console.log(image);
+    // }
+    //
+    // Generator();
+
+    // const Background = () => {
+    //     return (
+    //         <Fragment>
+    //             <div style={{
+    //                 backgroundImage: {background},
+    //                 backgroundRepeat:'no-repeat',
+    //             }}>
+    //                 <p>123123</p>
+    //             </div>
+    //
+    //         </Fragment>
+    //     )
+    // }
+
+    const submitHandler = (e) => {
+        e.preventDefault();
+        if (vicePropOne === 0 || vicePropTwo === 0 || vicePropThree === 0 || vicePropFour === 0) {
+            alert('至少有一个副属性位为空缺');
+        } else {
+            let data = {
+                "mode": mode,
+                "level": level,
+                "position": position,
+                "mainProp": mainProp,
+                "viceOne": {
+                    "prop": VICE_PROP_TYPE[vicePropOne - 1],
+                    "enhance": calculateEnhancement(vicePropOne,enhanceCountOne)
+                },
+                "viceTwo": {
+                    "prop": VICE_PROP_TYPE[vicePropTwo - 1],
+                    "enhance": calculateEnhancement(vicePropTwo, enhanceCountTwo)
+                },
+                "viceThree": {
+                    "prop": VICE_PROP_TYPE[vicePropThree - 1],
+                    "enhance": calculateEnhancement(vicePropThree, enhanceCountThree)
+                },
+                "viceFour": {
+                    "prop": VICE_PROP_TYPE[vicePropFour - 1],
+                    "enhance": calculateEnhancement(vicePropFour, enhanceCountFour)
+                }
+            };
+            console.log(data);
+            axios.post("http://localhost:4000/", data).then(response => {
+                // console.log(response.data);
+                // let picture = new Image();
+                //
+                // let base64 =  `data:image/png;base64,${response.data.split("'")[1]}`
+                //
+                // console.log(base64);
+                //
+                // picture.src = base64;
+
+                setArtifact(response.data.split("'")[1]);
+
+            })
+        }
+
+
+    }
+
+
     return (
-        <div>
-            <ToggleButtonGroup
-                color="primary"
-                value={mode}
-                exclusive
-                onChange={handleModeChange}
-            >
-                <ToggleButton value="web" className={classes.root}>提瓦特</ToggleButton>
-                <ToggleButton value="android" className={classes.root}>天空岛</ToggleButton>
-            </ToggleButtonGroup>
-            <FormLabel component="legend" className={classes.root}>圣遗物等级</FormLabel>
-            <Slider defaultValue={30} valueLabelDisplay="auto" step={4} marks min={0} max={20} value={level}
-                    onChange={handleLevelChange}/>
 
-            <FormControl component="fieldset">
-                <FormLabel component="legend" className={classes.root}>圣遗物位</FormLabel>
-                <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={position}
-                            onChange={handlePositionChange}>
-                    <FormControlLabel className={classes.root} value="flower" control={<Radio/>} label="生之花"/>
-                    <FormControlLabel className={classes.root} value="feather" control={<Radio/>} label="死之羽"/>
-                    <FormControlLabel className={classes.root} value="sandglass" control={<Radio/>}
-                                      label="时之沙"/>
-                    <FormControlLabel className={classes.root} value="goblet" control={<Radio/>} label="空之杯"/>
-                    <FormControlLabel className={classes.root} value="crown" control={<Radio/>} label="理之冠"/>
-                </RadioGroup>
-            </FormControl>
+        <Grid container spacing={{xs: 2, md: 1}}>
+            <Grid item xs={6}>
+                <p className="genshin_text">主工作界面</p>
+                <form onSubmit={submitHandler}>
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={mode}
+                        exclusive
+                        onChange={handleModeChange}
+                    >
+                        <ToggleButton value="web" className={classes.root}>提瓦特</ToggleButton>
+                        <ToggleButton value="android" className={classes.root} disabled>天空岛(前面的蛆)</ToggleButton>
+                    </ToggleButtonGroup>
+                    <FormLabel component="legend" className={classes.root}>圣遗物等级 +{level} (前面的蛆)</FormLabel>
+                    <Slider defaultValue={30} valueLabelDisplay="auto" step={4} marks min={0} max={20} value={level}
+                            onChange={handleLevelChange} disabled/>
 
-            <FormControl sx={{m: 1, minWidth: 120}}>
-                <InputLabel id="demo-simple-select-helper-label" className={classes.root}>主词条属性</InputLabel>
-                <Select
-                    labelId="main-prop-select-label"
-                    id="main-prop-select"
-                    value={mainProp}
-                    label="主词条"
-                    onChange={handleMainPropChange}
-                    className={classes.root}
-                >
-                    {constraints.map((each, index) => (
-                            <MenuItem key={each} value={index} className={classes.root}>{each}</MenuItem>
-                        )
-                    )}
-                </Select>
-            </FormControl>
-            <Grid container spacing={{xs: 2, md: 1}}>
-                <Grid item xs={8}>
-                    <p className="genshin_text">副词条属性</p>
-                </Grid>
-                <Grid item xs={4}>
-                    <p className="genshin_text">强化次数({remainingEnhanceCount})</p>
-                </Grid>
+                    <FormControl component="fieldset">
+                        <FormLabel component="legend" className={classes.root}>圣遗物位</FormLabel>
+                        <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={position}
+                                    onChange={handlePositionChange}>
+                            <FormControlLabel className={classes.root} value="flower" control={<Radio/>} label="生之花"/>
+                            <FormControlLabel className={classes.root} value="feather" control={<Radio/>} label="死之羽"/>
+                            <FormControlLabel className={classes.root} value="sandglass" control={<Radio/>}
+                                              label="时之沙"/>
+                            <FormControlLabel className={classes.root} value="goblet" control={<Radio/>} label="空之杯"/>
+                            <FormControlLabel className={classes.root} value="crown" control={<Radio/>} label="理之冠"/>
+                        </RadioGroup>
+                    </FormControl>
 
-
-                {/*---------------------artifact's vice prop selection-----------------------*/}
-
-                {generateVicePropUI(vicePropOne, handleVicePropOneChange)}
-
-                {GenerateEnhanceCountUI(enhanceCountOne, handleIncrementOne, handleDecrementOne)}
+                    <FormControl sx={{m: 1, minWidth: 120}}>
+                        <InputLabel id="demo-simple-select-helper-label" className={classes.root}>主词条属性</InputLabel>
+                        <Select
+                            labelId="main-prop-select-label"
+                            id="main-prop-select"
+                            value={mainProp}
+                            label="主词条"
+                            onChange={handleMainPropChange}
+                            className={classes.root}
+                        >
+                            {constraints.map((each, index) => (
+                                    <MenuItem key={each} value={index} className={classes.root}>{each}</MenuItem>
+                                )
+                            )}
+                        </Select>
+                    </FormControl>
+                    <Grid container spacing={{xs: 2, md: 1}}>
+                        <Grid item xs={8}>
+                            <p className="genshin_text">副词条属性</p>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <p className="genshin_text">强化次数({remainingEnhanceCount})</p>
+                        </Grid>
 
 
-                {generateVicePropUI(vicePropTwo, handleVicePropTwoChange)}
+                        {/*---------------------artifact's vice prop selection-----------------------*/}
 
-                {GenerateEnhanceCountUI(enhanceCountTwo, handleIncrementTwo, handleDecrementTwo)}
+                        {generateVicePropUI(vicePropOne, handleVicePropOneChange)}
 
-
-                {generateVicePropUI(vicePropThree, handleVicePropThreeChange)}
-
-                {GenerateEnhanceCountUI(enhanceCountThree, handleIncrementThree, handleDecrementThree)}
+                        {GenerateEnhanceCountUI(enhanceCountOne, handleIncrementOne, handleDecrementOne)}
 
 
-                {generateVicePropUI(vicePropFour, handleVicePropFourChange)}
+                        {generateVicePropUI(vicePropTwo, handleVicePropTwoChange)}
 
-                {GenerateEnhanceCountUI(enhanceCountFour, handleIncrementFour, handleDecrementFour)}
+                        {GenerateEnhanceCountUI(enhanceCountTwo, handleIncrementTwo, handleDecrementTwo)}
+
+
+                        {generateVicePropUI(vicePropThree, handleVicePropThreeChange)}
+
+                        {GenerateEnhanceCountUI(enhanceCountThree, handleIncrementThree, handleDecrementThree)}
+
+
+                        {generateVicePropUI(vicePropFour, handleVicePropFourChange)}
+
+                        {GenerateEnhanceCountUI(enhanceCountFour, handleIncrementFour, handleDecrementFour)}
+
+                    </Grid>
+                    <Button variant="contained" type="submit">生成</Button>
+                </form>
 
             </Grid>
-        </div>
-
+            <Grid item xs={6}>
+                <p className="genshin_text">生成界面</p>
+                {/*<Background>*/}
+                {/*    <p>some text</p>*/}
+                {/*</Background>*/}
+                <p>暂时假装生成了图片</p>
+                {!!artifact ? <SImg src={`data:image/png;base64,${artifact}`}/> : <SImg src={background}/>}
+            </Grid>
+        </Grid>
     )
 }
 
-export function MainArea() {
-    return (
-        <div>
-            <Grid container spacing={{xs: 2, md: 1}}>
-                <Grid item xs={6}>
-                    <p className="genshin_text">主工作界面</p>
-                    <Workshop/>
-                </Grid>
-                <Grid item xs={6}>
-                    <p className="genshin_text">生成界面</p>
-                </Grid>
-            </Grid>
-        </div>
-    )
-}
+// export function MainArea() {
+//     return (
+//         <div>
+//
+//         </div>
+//     )
+// }
