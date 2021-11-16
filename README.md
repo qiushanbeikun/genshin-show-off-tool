@@ -1,9 +1,9 @@
 **Only Chinese is supported in this version, English support will be in future updates.**
 
 This tool is to help you show off Genshin Impact artifacts in front your friends.  
-**Mode[Teyvat]**  
+**Teyvat Mode**  
 Generate artifacts you can possibly get in game. In this mode, the generating mechanism follows in-game constraints.  
-**Mode[Celestia](unreleased)**  
+**Celestia Mode (unreleased)**  
 Complete customizable. Generate artifacts with props whatever you want.  
   
 But please do not use this tool for PVP.
