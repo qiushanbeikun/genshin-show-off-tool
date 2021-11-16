@@ -12,16 +12,15 @@ import {
 } from "@mui/material";
 import {FormControl} from "@material-ui/core";
 import {GenshinStyles} from "../../theme";
-import {Fragment, useState} from "react";
+import {useState} from "react";
 import {
     calculateEnhancement,
-    CROWN_CONSTRAINT, ENHANCE_RATES,
+    CROWN_CONSTRAINT,
     FEATHER_CONSTRAINT,
-    FLOWER_CONSTRAINT, GOBLET_CONSTRAINT,
-    MAIN_PROP_TYPES,
+    FLOWER_CONSTRAINT, GOBLET_CONSTRAINT, JYZQY_NAMES, MAIN_PROP_RATE,
+    MAIN_PROP_TYPES, POSITION, propTypeCondenser,
     SANDGLASS_CONSTRAINT, VICE_PROP_TYPE
 } from "../../components/constances";
-import Jimp from "jimp";
 import background from "../../images/erased_template.png";
 import styled from "styled-components";
 import axios from "axios";
@@ -69,15 +68,15 @@ export const Workshop = () => {
 
     const [usedProps, setUsedProps] = useState([constraints[0]]);
 
-    const [vicePropOne, setVicePropOne] = useState(2);
+    const [vicePropOne, setVicePropOne] = useState(0);
 
-    const [vicePropTwo, setVicePropTwo] = useState(3);
+    const [vicePropTwo, setVicePropTwo] = useState(0);
 
-    const [vicePropThree, setVicePropThree] = useState(4);
+    const [vicePropThree, setVicePropThree] = useState(0);
 
-    const [vicePropFour, setVicePropFour] = useState(5);
+    const [vicePropFour, setVicePropFour] = useState(0);
 
-    const [remainingEnhanceCount, setRemainingEnhanceCount] = useState(5);
+    const [remainingEnhanceCount, setRemainingEnhanceCount] = useState(level / 4);
 
     // 圣遗物的起始强化次数为1
     const [enhanceCountOne, setEnhanceCountOne] = useState(1);
@@ -96,7 +95,6 @@ export const Workshop = () => {
 
     const handlePositionChange = (e) => {
         e.preventDefault();
-        console.log('position changed to ', e.target.value);
         setPosition(e.target.value);
         // update drop down of main prop type
         let newConstrains = getConstraint(e.target.value)
@@ -107,31 +105,36 @@ export const Workshop = () => {
         // we can hard code main prop to zero as it has been set above
         // setRemainingViceProps(getAvailableProps(0, e.target.value));
         // should also update remaining vice props when main prop changed.
-        updateViceProps(e.target.value);
+        resetViceProps(e.target.value);
         setUsedProps([newConstrains[0]]);
     }
 
-    const updateViceProps = () => {
+    const resetViceProps = () => {
         setVicePropOne(0);
         setVicePropTwo(0);
         setVicePropThree(0);
         setVicePropFour(0);
+        setEnhanceCountOne(1);
+        setEnhanceCountTwo(1);
+        setEnhanceCountThree(1);
+        setEnhanceCountFour(1);
+
     }
 
     const handleMainPropChange = (e) => {
         e.preventDefault();
-        console.log("main prop changed to ", e.target.value);
         setMainProp(e.target.value);
         // reset values for vice props
         // 为了简化步骤，在更改主词条属性后同样会重置副词条
-        updateViceProps();
-        setUsedProps(constraints[e.target.value]);
+        resetViceProps();
+        setUsedProps([constraints[e.target.value]]);
     }
 
     const handleLevelChange = (e) => {
         e.preventDefault();
-        // console.log('level change to ', e.target.value);
         setLevel(e.target.value);
+        resetViceProps();
+        setRemainingEnhanceCount(e.target.value / 4);
     }
 
 
@@ -143,7 +146,6 @@ export const Workshop = () => {
         if (pos !== 0) {
             temp = [...temp, VICE_PROP_TYPE[pos - 1]]
         }
-        console.log(temp)
         return temp
     }
 
@@ -272,7 +274,6 @@ export const Workshop = () => {
     //     }).then((returned) => {
     //
     //     })
-    //     console.log(image);
     // }
     //
     // Generator();
@@ -295,51 +296,30 @@ export const Workshop = () => {
         e.preventDefault();
         if (vicePropOne === 0 || vicePropTwo === 0 || vicePropThree === 0 || vicePropFour === 0) {
             alert('至少有一个副属性位为空缺');
+        } else if (remainingEnhanceCount !== 0) {
+            alert('有至少一次强化次数未使用');
         } else {
             let data = {
+                "title": JYZQY_NAMES[position],
                 "mode": mode,
                 "level": level,
-                "position": position,
-                "mainProp": mainProp,
-                "viceOne": {
-                    "prop": VICE_PROP_TYPE[vicePropOne - 1],
-                    "enhance": calculateEnhancement(vicePropOne,enhanceCountOne)
-                },
-                "viceTwo": {
-                    "prop": VICE_PROP_TYPE[vicePropTwo - 1],
-                    "enhance": calculateEnhancement(vicePropTwo, enhanceCountTwo)
-                },
-                "viceThree": {
-                    "prop": VICE_PROP_TYPE[vicePropThree - 1],
-                    "enhance": calculateEnhancement(vicePropThree, enhanceCountThree)
-                },
-                "viceFour": {
-                    "prop": VICE_PROP_TYPE[vicePropFour - 1],
-                    "enhance": calculateEnhancement(vicePropFour, enhanceCountFour)
-                }
+                "position": POSITION[position],
+                "mainProp": propTypeCondenser(constraints[mainProp]),
+                'mainPropRate': MAIN_PROP_RATE[constraints[mainProp]],
+                'viceOne': `${propTypeCondenser(VICE_PROP_TYPE[vicePropOne - 1])}+${calculateEnhancement(vicePropOne, enhanceCountOne)}`,
+                'viceTwo': `${propTypeCondenser(VICE_PROP_TYPE[vicePropTwo - 1])}+${calculateEnhancement(vicePropTwo, enhanceCountTwo)}`,
+                'viceThree': `${propTypeCondenser(VICE_PROP_TYPE[vicePropThree - 1])}+${calculateEnhancement(vicePropThree, enhanceCountThree)}`,
+                'viceFour': `${propTypeCondenser(VICE_PROP_TYPE[vicePropFour - 1])}+${calculateEnhancement(vicePropFour, enhanceCountFour)}`,
             };
             console.log(data);
             axios.post("http://localhost:4000/", data).then(response => {
-                // console.log(response.data);
-                // let picture = new Image();
-                //
-                // let base64 =  `data:image/png;base64,${response.data.split("'")[1]}`
-                //
-                // console.log(base64);
-                //
-                // picture.src = base64;
-
                 setArtifact(response.data.split("'")[1]);
-
             })
         }
-
-
     }
 
 
     return (
-
         <Grid container spacing={{xs: 2, md: 1}}>
             <Grid item xs={6}>
                 <p className="genshin_text">主工作界面</p>
@@ -353,9 +333,9 @@ export const Workshop = () => {
                         <ToggleButton value="web" className={classes.root}>提瓦特</ToggleButton>
                         <ToggleButton value="android" className={classes.root} disabled>天空岛(前面的蛆)</ToggleButton>
                     </ToggleButtonGroup>
-                    <FormLabel component="legend" className={classes.root}>圣遗物等级 +{level} (前面的蛆)</FormLabel>
+                    <FormLabel component="legend" className={classes.root}>圣遗物等级 +{level}</FormLabel>
                     <Slider defaultValue={30} valueLabelDisplay="auto" step={4} marks min={0} max={20} value={level}
-                            onChange={handleLevelChange} disabled/>
+                            onChange={handleLevelChange}/>
 
                     <FormControl component="fieldset">
                         <FormLabel component="legend" className={classes.root}>圣遗物位</FormLabel>

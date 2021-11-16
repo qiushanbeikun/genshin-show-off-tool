@@ -30,13 +30,15 @@ export const SANDGLASS_CONSTRAINT = [
 export const GOBLET_CONSTRAINT = [
     '攻击力百分比',
     '元素精通',
-    '风属性加成',
-    '火属性加成',
-    '水属性加成',
-    '雷属性加成',
-    '岩属性加成',
-    '冰属性加成',
-    '防御力百分比'];
+    '生命值',
+    '风元素伤害加成',
+    '火元素伤害加成',
+    '水元素伤害加成',
+    '雷元素伤害加成',
+    '岩元素伤害加成',
+    '冰元素伤害加成',
+    '物理伤害加成',
+    '防御力'];
 
 export const CROWN_CONSTRAINT = [
     '治疗加成',
@@ -71,9 +73,45 @@ export const ENHANCE_RATES = {
     'ctk_dmg': [5.4, 6.2, 7.0, 7.8],
 }
 
+export const POSITION = {
+    'flower': '生之花',
+    'feather': '死之羽',
+    'sandglass': '时之沙',
+    'goblet': '空之杯',
+    'crown': '理之冠'
+}
+
+export const MAIN_PROP_RATE = {
+    "攻击力百分比": '46.6%',
+    '攻击力': '311',
+    '元素精通': '187',
+    '生命值': '4780',
+    '生命值百分比':'46.6%',
+    '风元素伤害加成': '46.6%',
+    '火元素伤害加成': '46.6%',
+    '水元素伤害加成': '46.6%',
+    '雷元素伤害加成': '46.6%',
+    '岩元素伤害加成': '46.6%',
+    '冰元素伤害加成': '46.6%',
+    '物理伤害加成': '58.3%',
+    '防御力': '58.3%',
+    '暴击率':'31.1%',
+    '暴击伤害':'62.2%',
+    '治疗加成':'35.9%',
+    '元素充能效率':'51.8%',
+}
+
+export const JYZQY_NAMES = {
+    'flower': '明威之镡',
+    'feather': '切落之羽',
+    'sandglass': '雷云之笼',
+    'goblet': '绯花之壶',
+    'crown': '华饰之兜',
+}
+
 const mapHelper = (list, level) => {
     let result = 0;
-    for (let i=0; i<level; i++) {
+    for (let i = 0; i < level; i++) {
         result += list[Math.floor(Math.random() * 3)];
     }
     return result;
@@ -88,22 +126,27 @@ export const calculateEnhancement = (prop, level) => {
         case 3:
             return mapHelper(ENHANCE_RATES.def_num, level);
         case 4:
-            return (mapHelper(ENHANCE_RATES.atk_percent, level)).toFixed(1);
+            return (mapHelper(ENHANCE_RATES.atk_percent, level)).toFixed(1) + '%';
         case 5:
-            return (mapHelper(ENHANCE_RATES.life_percent, level)).toFixed(1);
+            return (mapHelper(ENHANCE_RATES.life_percent, level)).toFixed(1) + '%';
         case 6:
-            return (mapHelper(ENHANCE_RATES.def_percent, level)).toFixed(1);
+            return (mapHelper(ENHANCE_RATES.def_percent, level)).toFixed(1) + '%';
         case 7:
             return mapHelper(ENHANCE_RATES.ele_mastery, level);
         case 8:
-            return (mapHelper(ENHANCE_RATES.charge_rate, level)).toFixed(1);
+            return (mapHelper(ENHANCE_RATES.charge_rate, level)).toFixed(1) + '%';
         case 9:
-            return (mapHelper(ENHANCE_RATES.ctk_rate, level)).toFixed(1);
+            return (mapHelper(ENHANCE_RATES.ctk_rate, level)).toFixed(1) + '%';
         case 10:
-            return (mapHelper(ENHANCE_RATES.ctk_dmg, level)).toFixed(1);
+            return (mapHelper(ENHANCE_RATES.ctk_dmg, level)).toFixed(1) + '%';
         default:
             return -1
     }
 }
+
+export const propTypeCondenser = (prop) => {
+    return (prop.includes('百分比') ? prop.replace('百分比', '') : prop )
+}
+
 
 
