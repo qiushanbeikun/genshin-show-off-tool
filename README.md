@@ -38,6 +38,9 @@ Python 3.10 和 PIL(后端)
 为避免和后端服务冲突，默认接口为3001，  
 mac和linux用户需要更改package.json 中的start script
 
+提瓦特模式：  
+![test_image](https://user-images.githubusercontent.com/33504449/141938092-4692dfc5-d5e2-47a6-b0a3-cafe82cab01e.png)
 
-天空岛模式如下图所示  
+
+天空岛模式：  
 ![test_image](https://user-images.githubusercontent.com/33504449/141626435-9601be7a-0366-48dc-9b80-112756591361.png)
