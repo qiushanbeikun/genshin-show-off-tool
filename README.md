@@ -1,9 +1,9 @@
 **Only Chinese is supported in this version, English support will be in future updates.**
 
 This tool is to help you show off Genshin Impact artifacts in front your friends.  
-**Mode[Teyvat]**  
+**Teyvat Mode**  
 Generate artifacts you can possibly get in game. In this mode, the generating mechanism follows in-game constraints.  
-**Mode[Celestia]**  
+**Celestia Mode (unreleased)**  
 Complete customizable. Generate artifacts with props whatever you want.  
   
 But please do not use this tool for PVP.
@@ -24,7 +24,7 @@ Backend installation in: https://github.com/qiushanbeikun/genshin-show-off-backe
 
 **提瓦特模式**  
 生成可以在游戏中得到的圣遗物，生成规则依照游戏内的要求  
-**天空岛模式**  
+**天空岛模式(未开放)**  
 完全自定义
 
 各位玩玩就行了，请不要用本工具PVP。
@@ -38,6 +38,9 @@ Python 3.10 和 PIL(后端)
 为避免和后端服务冲突，默认接口为3001，  
 mac和linux用户需要更改package.json 中的start script
 
+提瓦特模式 Teyvat Mode：  
+![test_image](https://user-images.githubusercontent.com/33504449/141938092-4692dfc5-d5e2-47a6-b0a3-cafe82cab01e.png)
 
-天空岛模式如下图所示  
+
+天空岛模式模拟图 Celestia Mode (prototype)：  
 ![test_image](https://user-images.githubusercontent.com/33504449/141626435-9601be7a-0366-48dc-9b80-112756591361.png)
