@@ -1,0 +1,13 @@
+.input_field {
+    width: 80%;
+    padding: 0.4em;
+}
+
+.mode_selector {
+    text-align: center;
+    margin: 1em;
+}
+
+.left_editor {
+    margin: 1.5em;
+}
