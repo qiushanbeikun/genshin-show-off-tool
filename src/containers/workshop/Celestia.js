@@ -1,11 +1,16 @@
-import {Checkbox, FormControl, FormControlLabel, Grid, TextField} from "@mui/material";
+import {Checkbox, Grid, TextField} from "@mui/material";
 import {SImg} from "./MainArea";
 import background from "../../images/celestia_template.png";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import "./styles/mainPage.css"
 import "./styles/celestia.css"
 import {Button} from "@material-ui/core";
 import axios from "axios";
+import {ImageCropModal} from "./ImageCropModal";
+import Modal from "react-modal";
+import ReactCrop from "react-image-crop";
+import {getCroppedImg} from "./getCroppedImg";
+import {useDebounceEffect} from "./useDebounceEffect";
 
 const INPUT_PRESET = {
     "title": "",
@@ -29,6 +34,22 @@ export const Celestia = () => {
 
     const [inputObj, setInputObj] = useState(INPUT_PRESET);
 
+    const [imgPath, setImgPath] = useState("");
+
+    const [isModalActive, setIsModalActive] = useState(false);
+
+    const [tempImg, setTempImg] = useState();
+
+    const imgRef = useRef();
+    const [crop, setCrop] = useState({
+        unit: "px",
+        x: 25,
+        y: 25,
+        width: 50,
+        height: 50,
+    });
+    const [completeCrop, setCompleteCrop] = useState();
+
     const handleInputChange = (e) => {
         e.preventDefault();
         const {name, value} = e.target;
@@ -36,9 +57,28 @@ export const Celestia = () => {
     }
 
     const handleBlankRuleChange = (e) => {
-        e.preventDefault();
-        console.log(e.target.checked);
         setInputObj({...inputObj, "allowBlank": !inputObj.allowBlank});
+    }
+
+    const handleImgUpload = (e) => {
+        e.preventDefault();
+        if (e.target.files.length !== 0) {
+            setImgPath(URL.createObjectURL(e.target.files[0]));
+            setIsModalActive(true);
+        }
+    }
+
+    const handleCropComplete = (c, pc) => {
+        console.log(123, pc,c)
+        getCroppedImg(imgRef.current, c).then((res) => {
+            console.log(res);
+            setTempImg(res);
+        })
+    }
+
+    const handleModalClose = (e) => {
+        e.preventDefault();
+        setIsModalActive(false);
     }
 
     const submitHandler = (e) => {
@@ -51,15 +91,16 @@ export const Celestia = () => {
             // todo highlight the empty inputs
         }
 
-        // make request to backend
-
-        console.log(inputObj);
         axios.post("http://localhost:4000/chinese_celestia/", inputObj).then((response) => {
             console.log(response.data)
             setArtifact(response.data.split("'")[1])
         });
 
+    }
 
+    const handleModifyCrop = (e) => {
+        e.preventDefault();
+        setIsModalActive(true);
     }
 
     return (
@@ -75,6 +116,15 @@ export const Celestia = () => {
                             </Grid>
                             <Grid item xs="8">
                                 <Checkbox checked={inputObj["allowBlank"]} onChange={handleBlankRuleChange}/>
+                            </Grid>
+                            <Grid item xs="4">
+                                <p>圣遗物图片</p>
+                            </Grid>
+                            <Grid item xs="8">
+                                <input type="file" accept="*image" id="select_artifact_img" onChange={handleImgUpload}/>
+                                <button type="button" onClick={handleModifyCrop}>修改裁剪</button>
+                                {(!!tempImg)? <img src={tempImg} alt="whatever"/> : <p>预览</p>}
+
                             </Grid>
                             <Grid item xs="4">
                                 <p>圣遗物名称</p>
@@ -156,12 +206,28 @@ export const Celestia = () => {
                         </Grid>
                         <Button variant="contained" type="submit" className="submit_button">生成</Button>
                     </div>
+
                 </Grid>
                 <Grid item xs="6">
                     <p className="genshin_text">生成界面</p>
                     {!!artifact ? <SImg src={`data:image/png;base64,${artifact}`}/> : <SImg src={background}/>}
                 </Grid>
             </Grid>
+
+
+            {/*<ImageCropModal isModalActive={isModalActive} imgPath={imgPath} handleModalClose={handleModalClose}/>*/}
+
+            <div>
+                <Modal isOpen={isModalActive}>
+                    <div>
+                        <p>图片裁剪</p>
+                        <Button onClick={handleModalClose}>Crop</Button>
+                    </div>
+                    <ReactCrop crop={crop} onChange={c => setCrop(c)} onComplete={handleCropComplete} aspectf={1}>
+                        <img src={imgPath} alt="img_to_crop" ref={imgRef}/>
+                    </ReactCrop>
+                </Modal>
+            </div>
         </form>
     )
 

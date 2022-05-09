@@ -17,7 +17,7 @@ export const Navbar = () => {
                     <IconButton edge="start" color="inherit" aria-label="menu" sx={{mr: 2}}>
                         <AppsIcon/>
                     </IconButton>
-                    <BarTitle className="genshin_text" sx={{flexGrow: 1}}>原神圣遗物生成器(装逼用)</BarTitle>
+                    <BarTitle className="genshin_text" sx={{flexGrow: 1}}>原神圣遗物生成器</BarTitle>
                     <Button color="inherit">中文</Button>
                     <Button color="inherit">English (coming soon)</Button>
                 </Toolbar>

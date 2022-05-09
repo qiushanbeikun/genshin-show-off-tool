@@ -27,6 +27,9 @@ import {getConstraint, SImg} from "./MainArea";
 import "./styles/tayvet.css";
 import "./styles/mainPage.css";
 
+
+// todo reformat code using Formik
+
 export const Teyvat = () => {
 
     const classes = GenshinStyles();
@@ -240,30 +243,6 @@ export const Teyvat = () => {
         </Grid>
     )
 
-    // const Generator = async () => {
-    //     let image = Jimp.loadFont('../../fonts/zh-cn.ttf').then((font) => {
-    //         background.print(font, 400, 200, 'test message');
-    //     }).then((returned) => {
-    //
-    //     })
-    // }
-    //
-    // Generator();
-
-    // const Background = () => {
-    //     return (
-    //         <Fragment>
-    //             <div style={{
-    //                 backgroundImage: {background},
-    //                 backgroundRepeat:'no-repeat',
-    //             }}>
-    //                 <p>123123</p>
-    //             </div>
-    //
-    //         </Fragment>
-    //     )
-    // }
-
     const submitHandler = (e) => {
         e.preventDefault();
         if (vicePropOne === 0 || vicePropTwo === 0 || vicePropThree === 0 || vicePropFour === 0) {
@@ -298,10 +277,6 @@ export const Teyvat = () => {
                 <div className="left_editor">
                     <p className="genshin_text">主工作界面</p>
                     <form onSubmit={submitHandler}>
-
-                        {/*<FormLabel component="legend" className={classes.root}>圣遗物等级 +{level}</FormLabel>*/}
-                        {/*<Slider defaultValue={30} valueLabelDisplay="auto" step={4} marks min={0} max={20} value={level}*/}
-                        {/*        onChange={handleLevelChange} disabled/>*/}
 
                         <FormControl component="fieldset">
                             <FormLabel component="legend" className={classes.root}>圣遗物位</FormLabel>
@@ -348,22 +323,15 @@ export const Teyvat = () => {
                             {/*---------------------artifact's vice prop selection-----------------------*/}
 
                             {generateVicePropUI(vicePropOne, handleVicePropOneChange)}
-
                             {GenerateEnhanceCountUI(enhanceCountOne, handleIncrementOne, handleDecrementOne)}
 
-
                             {generateVicePropUI(vicePropTwo, handleVicePropTwoChange)}
-
                             {GenerateEnhanceCountUI(enhanceCountTwo, handleIncrementTwo, handleDecrementTwo)}
 
-
                             {generateVicePropUI(vicePropThree, handleVicePropThreeChange)}
-
                             {GenerateEnhanceCountUI(enhanceCountThree, handleIncrementThree, handleDecrementThree)}
 
-
                             {generateVicePropUI(vicePropFour, handleVicePropFourChange)}
-
                             {GenerateEnhanceCountUI(enhanceCountFour, handleIncrementFour, handleDecrementFour)}
 
                         </Grid>
